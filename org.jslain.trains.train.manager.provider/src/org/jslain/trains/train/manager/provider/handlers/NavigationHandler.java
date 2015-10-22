@@ -7,6 +7,7 @@ import org.jslain.trains.train.manager.provider.IPathCalculatorFactory;
 import org.jslain.trains.train.manager.provider.TrainDto;
 import org.jslain.trains.train.manager.provider.TrainState;
 
+import osgi.enroute.trains.cloud.api.Segment;
 import osgi.enroute.trains.cloud.api.TrackForTrain;
 import osgi.enroute.trains.train.api.TrainController;
 
@@ -37,10 +38,15 @@ public class NavigationHandler implements INavigationHandler {
 				changeState(trainDto, trainController, TrainState.STOPPING);
 				
 				String nextSegment = calculator.getSegmentWeNeedAccessTo();
-				while(!trackManager.requestAccessTo(trainDto.name, trainDto.currentLocation, nextSegment)){
+				Segment segFrom = trackManager.getSegments().get(trainDto.currentLocation);
+				Segment segTo = trackManager.getSegments().get(nextSegment);
+				
+				while(!trackManager.requestAccessTo(trainDto.name, segFrom.track, segTo.track)){
 					calculator.excludePossibility(nextSegment);
 					
 					nextSegment = calculator.getSegmentWeNeedAccessTo();
+					segFrom = trackManager.getSegments().get(trainDto.currentLocation);
+					segTo = trackManager.getSegments().get(nextSegment);
 				}
 
 				changeState(trainDto, trainController, TrainState.MOVING);
@@ -71,7 +77,7 @@ public class NavigationHandler implements INavigationHandler {
 			trainController.light(false);
 			break;
 		case MOVING:
-			trainController.move(Speed.SPEED_3.value);
+			trainController.move(Speed.SPEED_2.value);
 			trainController.light(true);
 			break;
 		}

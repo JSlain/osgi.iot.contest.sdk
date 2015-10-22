@@ -1,0 +1,5 @@
+{
+ "revisionRefs":[{
+  "artifactId":"mockito-all","baseline":"2.0.2","bsn":"org.mockito.mockito-all","created":1420215717044,"description":"Mock objects library for java","groupId":"org.mockito","md5":"90E79C2B81C1004D812CC32BA3AF97B1","name":"Mockito Mock Library for Java. Hamcrest-core & Objenesis included in the bundle.","phase":"MASTER","qualifier":"beta","revision":"3E24F450275812FB354D29A58B66B8F26E13002F","size":1234720,"urls":["http://repo1.maven.org/maven2/org/mockito/mockito-all/2.0.2-beta/mockito-all-2.0.2-beta.jar"],"version":"2.0.2-beta"
+ }]
+}

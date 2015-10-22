@@ -10,7 +10,7 @@
 	    "name": "DemoTrain",
 	    "rfid": "rfid1234",
 	    "target.TrainController" : "train.rfid=rfid1234"
-	},	
+	},
 	{
 	    "service.pid":"osgi.enroute.trains.track.manager",
 	    "name": "main",
