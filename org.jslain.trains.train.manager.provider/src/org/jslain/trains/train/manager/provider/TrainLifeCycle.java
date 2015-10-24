@@ -4,12 +4,10 @@ import java.util.List;
 
 import osgi.enroute.trains.cloud.api.Observation;
 import osgi.enroute.trains.cloud.api.TrackForTrain;
-import osgi.enroute.trains.train.api.TrainConfiguration;
 import osgi.enroute.trains.train.api.TrainController;
 
 public class TrainLifeCycle implements ITrainLifeCycle{
 
-	protected static final int DEFAULT_SPEED = 300;
 	
 	protected static final long STARTING_OBSERVATION = -1;
 	

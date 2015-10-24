@@ -42,7 +42,7 @@ public class NavigationHandler implements INavigationHandler {
 				Segment segTo = trackManager.getSegments().get(nextSegment);
 				
 				while(!trackManager.requestAccessTo(trainDto.name, segFrom.track, segTo.track)){
-					calculator.excludePossibility(nextSegment);
+					calculator.excludePossibility(segTo.track);
 					
 					nextSegment = calculator.getSegmentWeNeedAccessTo();
 					segFrom = trackManager.getSegments().get(trainDto.currentLocation);
@@ -77,7 +77,7 @@ public class NavigationHandler implements INavigationHandler {
 			trainController.light(false);
 			break;
 		case MOVING:
-			trainController.move(Speed.SPEED_2.value);
+			trainController.move(Speed.SPEED_3.value);
 			trainController.light(true);
 			break;
 		}

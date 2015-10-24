@@ -6,10 +6,6 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
-import org.jslain.trains.train.manager.provider.INavigationHandler;
-import org.jslain.trains.train.manager.provider.ITrainObservationHandler;
-import org.jslain.trains.train.manager.provider.TrainDto;
-import org.jslain.trains.train.manager.provider.TrainObservationHandlerFactory;
 import org.jslain.trains.train.manager.provider.handlers.AssignmentHandler;
 import org.jslain.trains.train.manager.provider.handlers.LocatedHandler;
 import org.jslain.trains.train.manager.provider.handlers.NoopHandler;
@@ -54,7 +50,7 @@ public class TrainObservationHandlerFactoryTest {
 		testType(Type.EMULATOR_TRAIN_WRONG_SWITCH, NoopHandler.class);
 	}
 	
-	private void testType(Type type, Class clazz){
+	private void testType(Type type, Class<?> clazz){
 		Observation observation = newObservation(type);
 		ITrainObservationHandler result = underTest.create(observation);
 		

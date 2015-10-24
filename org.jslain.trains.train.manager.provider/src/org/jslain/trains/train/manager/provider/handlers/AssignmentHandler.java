@@ -1,7 +1,5 @@
 package org.jslain.trains.train.manager.provider.handlers;
 
-import osgi.enroute.trains.train.api.TrainController;
-
 public class AssignmentHandler extends BaseHandler {
 
 	@Override

@@ -1,26 +1,19 @@
 package org.jslain.trains.train.manager.provider;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.jslain.trains.train.manager.provider.ITrainObservationHandler;
-import org.jslain.trains.train.manager.provider.ITrainObservationHandlerFactory;
-import org.jslain.trains.train.manager.provider.TrainDto;
-import org.jslain.trains.train.manager.provider.TrainLifeCycle;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.mockito.internal.verification.VerificationModeFactory;
 
 import osgi.enroute.trains.cloud.api.Observation;
 import osgi.enroute.trains.cloud.api.TrackForTrain;
-import osgi.enroute.trains.train.api.TrainConfiguration;
 import osgi.enroute.trains.train.api.TrainController;
 
 public class TrainLifeCycleTest {

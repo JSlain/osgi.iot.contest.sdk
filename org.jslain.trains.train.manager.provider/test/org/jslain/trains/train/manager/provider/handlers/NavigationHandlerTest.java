@@ -175,7 +175,7 @@ public class NavigationHandlerTest {
 		ArgumentCaptor<Integer> captor1 = ArgumentCaptor.forClass(Integer.class);
 		verify(mockTrainController, times(2)).move(captor1.capture());
 		
-		verify(mockPathCalculator).excludePossibility("T2_SEG1");
+		verify(mockPathCalculator).excludePossibility("TRACK2");
 		
 		assertThat(captor1.getAllValues().get(0), is(equalTo(0)));
 		assertThat(captor1.getAllValues().get(1), is(greaterThan(0)));

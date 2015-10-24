@@ -18,11 +18,13 @@ public class DefaultPathCalculator implements IPathCalculator{
 	private String from;
 	private String to;
 	private Map<String, Segment> map;
+	private Set<String> tracksDenied;
 	
 	public DefaultPathCalculator(String from, String to, Map<String, Segment> map) {
 		this.from = from;
 		this.to = to;
 		this.map = map;
+		tracksDenied = new HashSet<>();
 	}
 
 	@Override
@@ -52,11 +54,12 @@ public class DefaultPathCalculator implements IPathCalculator{
 				PathExplorer explorer = explorers.get(keys);
 				
 				boolean removed = false;
-				for(String to : explorer.current.to){
+				for(String to : explorer.current.to){					
 					if(explorer.alreadyVisited.contains(to)){
 						toRemove.add(keys);
 						removed = true;
 					}
+					
 				}
 				
 				if(!removed){
@@ -66,23 +69,26 @@ public class DefaultPathCalculator implements IPathCalculator{
 						
 						//We create 2 new paths with each 'to'
 						for(String to : explorer.current.to){
-							PathExplorer explorerToAdd = new PathExplorer();
-							explorerToAdd.switches.addAll(explorer.switches);
-							explorerToAdd.switches.add(to);
-							explorerToAdd.alreadyVisited.addAll(explorer.alreadyVisited);
-							explorerToAdd.alreadyVisited.add(to);
-							explorerToAdd.current = map.get(to);
-							explorerToAdd.firstSegmentAfterFirstSwitch = explorer.firstSegmentAfterFirstSwitch;
-							
-							if(explorerToAdd.firstSegmentAfterFirstSwitch == null){
-								explorerToAdd.firstSegmentAfterFirstSwitch = explorerToAdd.current.id;
-							}
-							
-							toAdd.add(explorerToAdd);
-							
-							if(explorerToAdd.current.id.equals(this.to)){
-								pathFound = explorerToAdd;
-								found = true;
+							Segment segTo = map.get(to);
+							if(!tracksDenied.contains(segTo.track)){
+								PathExplorer explorerToAdd = new PathExplorer();
+								explorerToAdd.switches.addAll(explorer.switches);
+								explorerToAdd.switches.add(to);
+								explorerToAdd.alreadyVisited.addAll(explorer.alreadyVisited);
+								explorerToAdd.alreadyVisited.add(to);
+								explorerToAdd.current = map.get(to);
+								explorerToAdd.firstSegmentAfterFirstSwitch = explorer.firstSegmentAfterFirstSwitch;
+								
+								if(explorerToAdd.firstSegmentAfterFirstSwitch == null){
+									explorerToAdd.firstSegmentAfterFirstSwitch = explorerToAdd.current.id;
+								}
+								
+								toAdd.add(explorerToAdd);
+								
+								if(explorerToAdd.current.id.equals(this.to)){
+									pathFound = explorerToAdd;
+									found = true;
+								}
 							}
 						}
 					}
@@ -138,8 +144,7 @@ public class DefaultPathCalculator implements IPathCalculator{
 	}
 	
 	@Override
-	public void excludePossibility(String string) {
-		// TODO Auto-generated method stub
-		
+	public void excludePossibility(String track) {
+		tracksDenied.add(track);
 	}
 }

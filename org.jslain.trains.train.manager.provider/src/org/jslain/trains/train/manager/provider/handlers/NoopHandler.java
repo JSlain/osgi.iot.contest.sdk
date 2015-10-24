@@ -1,7 +1,5 @@
 package org.jslain.trains.train.manager.provider.handlers;
 
-import osgi.enroute.trains.cloud.api.Observation;
-
 /**
  * No operations
  * 

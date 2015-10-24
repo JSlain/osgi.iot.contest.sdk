@@ -99,7 +99,7 @@ public class DefaultPathCalculatorTest {
 		
 	}
 	
-	@Test()
+	@Test(timeout=1000L)
 	public void getSegmentWeNeedAccessTo_shortestPath(){
 		initComplexPath();
 		
@@ -115,6 +115,17 @@ public class DefaultPathCalculatorTest {
 		initComplexPath();
 		
 		underTest = new DefaultPathCalculator("S1", "T5_S2", testSegments.getSegments());
+		
+		String result = underTest.getSegmentWeNeedAccessTo();
+		
+		assertEquals("T3_S1", result);
+	}
+	
+	@Test(timeout=1000L)
+	public void getSegmentWeNeedAccessTo_whenPathExcluded_alternateWayFound(){
+		initComplexPath();
+		underTest = new DefaultPathCalculator("S1", "S0", testSegments.getSegments());
+		underTest.excludePossibility("TRACK2");
 		
 		String result = underTest.getSegmentWeNeedAccessTo();
 		
