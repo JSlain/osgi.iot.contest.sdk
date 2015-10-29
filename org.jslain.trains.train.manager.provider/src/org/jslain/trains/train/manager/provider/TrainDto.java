@@ -13,4 +13,6 @@ public class TrainDto extends DTO{
 	public String currentLocation;
 
 	public TrainState state;
+
+	public boolean nextSegmentIsTarget;
 }

@@ -34,6 +34,10 @@ public class DefaultPathCalculator implements IPathCalculator{
 	
 	@Override
 	public String getSegmentWeNeedAccessTo() {
+		if(from == null){
+			return null;
+		}
+		
 		boolean found = false;
 		boolean allPathExplored = false;
 		
@@ -77,10 +81,11 @@ public class DefaultPathCalculator implements IPathCalculator{
 								explorerToAdd.alreadyVisited.addAll(explorer.alreadyVisited);
 								explorerToAdd.alreadyVisited.add(to);
 								explorerToAdd.current = map.get(to);
-								explorerToAdd.firstSegmentAfterFirstSwitch = explorer.firstSegmentAfterFirstSwitch;
+								explorerToAdd.firstLocatorAfterFirstSwitch = explorer.firstLocatorAfterFirstSwitch;
 								
-								if(explorerToAdd.firstSegmentAfterFirstSwitch == null){
-									explorerToAdd.firstSegmentAfterFirstSwitch = explorerToAdd.current.id;
+								if(explorerToAdd.firstLocatorAfterFirstSwitch == null
+										&& Segment.Type.LOCATOR == explorerToAdd.current.type){
+									explorerToAdd.firstLocatorAfterFirstSwitch = explorerToAdd.current.id;
 								}
 								
 								toAdd.add(explorerToAdd);
@@ -100,6 +105,11 @@ public class DefaultPathCalculator implements IPathCalculator{
 							pathFound = explorer;
 							found = true;
 						}
+						
+						if(explorer.firstLocatorAfterFirstSwitch == null
+								&& Segment.Type.LOCATOR == explorer.current.type){
+							explorer.firstLocatorAfterFirstSwitch = explorer.current.id;
+						}
 					}
 				}
 			}
@@ -108,7 +118,7 @@ public class DefaultPathCalculator implements IPathCalculator{
 			toAdd.forEach(e -> explorers.put(e.switches, e));
 		}
 		
-		return pathFound.firstSegmentAfterFirstSwitch;
+		return pathFound.firstLocatorAfterFirstSwitch;
 	}
 	
 	private static class PathExplorer extends DTO{
@@ -116,7 +126,7 @@ public class DefaultPathCalculator implements IPathCalculator{
 		Set<String> alreadyVisited = new HashSet<>();
 		
 		Segment current;
-		String firstSegmentAfterFirstSwitch;
+		String firstLocatorAfterFirstSwitch;
 	}
 	
 	@Override

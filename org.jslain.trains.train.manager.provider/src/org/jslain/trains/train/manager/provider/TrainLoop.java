@@ -14,9 +14,13 @@ public class TrainLoop implements Runnable{
 			trainLife.start();
 			
 			while(!Thread.currentThread().isInterrupted()){
+				Thread.sleep(50L);
 				trainLife.update();
 			}
 			
+		}
+		catch(Exception e){
+			e.printStackTrace();
 		}finally{
 			trainLife.end();
 		}

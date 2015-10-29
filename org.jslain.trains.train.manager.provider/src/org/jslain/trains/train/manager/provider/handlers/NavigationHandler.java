@@ -28,16 +28,23 @@ public class NavigationHandler implements INavigationHandler {
 		boolean goalReached = isGoalReached(trainDto);
 		if(goalReached){
 			changeState(trainDto, trainController, TrainState.STOPPING);
+		}else if(trainDto.state == TrainState.SLOWLY_SEARCHING_LOCATOR_BACKWARD){
+			changeState(trainDto, trainController, TrainState.SLOWLY_SEARCHING_LOCATOR_BACKWARD);
 		}else{
 			IPathCalculator calculator = pathCalculatorFactory.create(
 					trainDto.currentLocation, 
 					trainDto.targetSegment, 
 					trackManager.getSegments());
 			
+			String nextSegment = calculator.getSegmentWeNeedAccessTo();
+			if(trainDto.targetSegment != null &&
+					trainDto.targetSegment.equals(nextSegment)){
+				trainDto.nextSegmentIsTarget = true;
+			}
+			
 			if(calculator.shouldRequestAccess()){
 				changeState(trainDto, trainController, TrainState.STOPPING);
 				
-				String nextSegment = calculator.getSegmentWeNeedAccessTo();
 				Segment segFrom = trackManager.getSegments().get(trainDto.currentLocation);
 				Segment segTo = trackManager.getSegments().get(nextSegment);
 				
@@ -79,6 +86,9 @@ public class NavigationHandler implements INavigationHandler {
 		case MOVING:
 			trainController.move(Speed.SPEED_3.value);
 			trainController.light(true);
+			break;
+		case SLOWLY_SEARCHING_LOCATOR_BACKWARD:
+			trainController.move(-Speed.SPEED_1.value);
 			break;
 		}
 	}

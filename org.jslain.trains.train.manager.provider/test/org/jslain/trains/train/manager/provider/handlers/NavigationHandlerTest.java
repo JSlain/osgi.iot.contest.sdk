@@ -3,19 +3,22 @@ package org.jslain.trains.train.manager.provider.handlers;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.lessThan;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.jslain.trains.train.manager.provider.Constants;
 import org.jslain.trains.train.manager.provider.Constants.Direction;
 import org.jslain.trains.train.manager.provider.Constants.Speed;
 import org.jslain.trains.train.manager.provider.IPathCalculator;
 import org.jslain.trains.train.manager.provider.IPathCalculatorFactory;
 import org.jslain.trains.train.manager.provider.TestSegments;
 import org.jslain.trains.train.manager.provider.TrainDto;
+import org.jslain.trains.train.manager.provider.TrainState;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -158,9 +161,7 @@ public class NavigationHandlerTest {
 				trainDto.name, 
 				"TRACK1", 
 				"TRACK2")).thenReturn(false);
-		
 		// pathCalculator.excludePossibility("T2_SEG1")
-		
 		when(mockTrackManager.requestAccessTo(
 				trainDto.name, 
 				"TRACK1", 
@@ -174,14 +175,66 @@ public class NavigationHandlerTest {
 	
 		ArgumentCaptor<Integer> captor1 = ArgumentCaptor.forClass(Integer.class);
 		verify(mockTrainController, times(2)).move(captor1.capture());
-		
 		verify(mockPathCalculator).excludePossibility("TRACK2");
-		
 		assertThat(captor1.getAllValues().get(0), is(equalTo(0)));
 		assertThat(captor1.getAllValues().get(1), is(greaterThan(0)));
 		
 
 	}
 	
+	@Test
+	public void trainStateSlowlySearchingLocatorBackward_whenUpdateTrip_thenMoveBackward(){
+		trainDto.state = TrainState.SLOWLY_SEARCHING_LOCATOR_BACKWARD;
+		
+		underTest.updateTrip(
+				trainDto, 
+				mockTrackManager,
+				mockTrainController);
+		
+		ArgumentCaptor<Integer> capture = ArgumentCaptor.forClass(Integer.class);
+		verify(mockTrainController).move(capture.capture());
+		assertThat(capture.getValue(), is(lessThan(0)));
+	}
 	
+	@Test
+	public void trainStateSlowlySearchingLocatorBackward_whenUpdateTrip_thenBackwardSpeed1(){
+		trainDto.state = TrainState.SLOWLY_SEARCHING_LOCATOR_BACKWARD;
+		
+		underTest.updateTrip(
+				trainDto, 
+				mockTrackManager,
+				mockTrainController);
+		
+		ArgumentCaptor<Integer> capture = ArgumentCaptor.forClass(Integer.class);
+		verify(mockTrainController).move(capture.capture());
+		assertThat(Math.abs(capture.getValue()), is(equalTo(Constants.Speed.SPEED_1.value)));
+	}
+	
+	@Test
+	public void trainSlowlyMovingBackward_whenGoalReached_thenTrainBecomesIdle(){
+		trainDto.state = TrainState.SLOWLY_SEARCHING_LOCATOR_BACKWARD;
+		trainDto.currentLocation = "SEG1";
+		trainDto.targetSegment = "SEG1";
+		
+		underTest.updateTrip(
+				trainDto, 
+				mockTrackManager,
+				mockTrainController);
+		
+		verify(mockTrainController).move(Speed.IDLE.value);
+	}
+	
+	@Test
+	public void whenLocatorAndNextSegmentIsTarget_whenUpdateTrip_nextSegmentIsTargetIndicatorTrue(){
+		trainDto.targetSegment = "SEGM_TARGET";
+		
+		when(mockPathCalculator.getSegmentWeNeedAccessTo()).thenReturn("SEGM_TARGET");
+		
+		underTest.updateTrip(
+				trainDto, 
+				mockTrackManager,
+				mockTrainController);
+		
+		assertTrue(trainDto.nextSegmentIsTarget);
+	}
 }

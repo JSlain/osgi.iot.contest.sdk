@@ -7,6 +7,7 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
+import osgi.enroute.scheduler.api.Scheduler;
 import osgi.enroute.trains.cloud.api.TrackForTrain;
 import osgi.enroute.trains.train.api.TrainConfiguration;
 import osgi.enroute.trains.train.api.TrainController;
@@ -25,6 +26,9 @@ public class JSlainTrainManagerImpl {
 	
 	@Reference
 	private TrainController trainController;
+	
+	@Reference
+	private Scheduler scheduler;
 	
 	private Thread trainThread;
 	

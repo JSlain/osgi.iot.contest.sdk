@@ -6,7 +6,7 @@ ${Bundle-Description}
 
 ## Configuration
 
-	Pid: org.jslain.trains.track.manager
+	Pid: org.jslain.trains.train.manager
 	
 	Field					Type				Description
 		
