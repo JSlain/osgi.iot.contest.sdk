@@ -136,11 +136,6 @@ public class DefaultPathCalculator implements IPathCalculator{
 				toRemove.forEach(e -> explorers.remove(e));
 				toAdd.forEach(e -> explorers.put(e.switches, e));
 			}
-
-			System.out.println(String.format("Current: %s\tNextLocator: %s\tFirstLocatorAfterSwitch: %s", 
-					pathFound.current.id,
-					pathFound.nextLocator,
-					pathFound.firstLocatorAfterFirstSwitch));
 		}
 	}
 	
