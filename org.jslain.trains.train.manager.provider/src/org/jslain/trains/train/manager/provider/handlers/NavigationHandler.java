@@ -27,6 +27,7 @@ public class NavigationHandler implements INavigationHandler {
 		
 		boolean goalReached = isGoalReached(trainDto);
 		if(goalReached){
+			goalReached(trainDto);
 			changeState(trainDto, trainController, TrainState.STOPPING);
 		}else if(trainDto.state == TrainState.SLOWLY_SEARCHING_LOCATOR_BACKWARD){
 			changeState(trainDto, trainController, TrainState.SLOWLY_SEARCHING_LOCATOR_BACKWARD);
@@ -36,7 +37,7 @@ public class NavigationHandler implements INavigationHandler {
 					trainDto.targetSegment, 
 					trackManager.getSegments());
 			
-			String nextSegment = calculator.getSegmentWeNeedAccessTo();
+			String nextSegment = calculator.getNextLocator();
 			if(trainDto.targetSegment != null &&
 					trainDto.targetSegment.equals(nextSegment)){
 				trainDto.nextSegmentIsTarget = true;
@@ -45,8 +46,9 @@ public class NavigationHandler implements INavigationHandler {
 			if(calculator.shouldRequestAccess()){
 				changeState(trainDto, trainController, TrainState.STOPPING);
 				
+				String nextSegmentWeNeedAccessTo = calculator.getSegmentWeNeedAccessTo();
 				Segment segFrom = trackManager.getSegments().get(trainDto.currentLocation);
-				Segment segTo = trackManager.getSegments().get(nextSegment);
+				Segment segTo = trackManager.getSegments().get(nextSegmentWeNeedAccessTo);
 				
 				while(!trackManager.requestAccessTo(trainDto.name, segFrom.track, segTo.track)){
 					calculator.excludePossibility(segTo.track);
@@ -68,6 +70,10 @@ public class NavigationHandler implements INavigationHandler {
 	
 	private boolean isGoalReached(TrainDto trainDto){
 		return trainDto.currentLocation != null && trainDto.currentLocation.equals(trainDto.targetSegment);
+	}
+	
+	private void goalReached(TrainDto trainDto){
+		trainDto.nextSegmentIsTarget=false;
 	}
 	
 	private void changeState(

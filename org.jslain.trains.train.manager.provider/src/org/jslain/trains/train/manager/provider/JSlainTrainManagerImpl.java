@@ -27,8 +27,6 @@ public class JSlainTrainManagerImpl {
 	@Reference
 	private TrainController trainController;
 	
-	@Reference
-	private Scheduler scheduler;
 	
 	private Thread trainThread;
 	
@@ -57,10 +55,16 @@ public class JSlainTrainManagerImpl {
 	@Deactivate
 	public void deactivate() {
 		try{
+			
 			trainThread.interrupt();
 			trainThread.join();
+			
 		}catch(InterruptedException e){
 			//Nothing to do..
 		}
+		trackForTrain = null;
+		trainController = null;
+		trainThread = null;
+		trainDto = null;
 	}
 }

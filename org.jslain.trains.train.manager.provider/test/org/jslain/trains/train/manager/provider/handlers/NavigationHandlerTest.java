@@ -228,7 +228,7 @@ public class NavigationHandlerTest {
 	public void whenLocatorAndNextSegmentIsTarget_whenUpdateTrip_nextSegmentIsTargetIndicatorTrue(){
 		trainDto.targetSegment = "SEGM_TARGET";
 		
-		when(mockPathCalculator.getSegmentWeNeedAccessTo()).thenReturn("SEGM_TARGET");
+		when(mockPathCalculator.getNextLocator()).thenReturn("SEGM_TARGET");
 		
 		underTest.updateTrip(
 				trainDto, 

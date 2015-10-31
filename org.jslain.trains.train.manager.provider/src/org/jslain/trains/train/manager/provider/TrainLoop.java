@@ -18,6 +18,8 @@ public class TrainLoop implements Runnable{
 				trainLife.update();
 			}
 			
+			
+			
 		}
 		catch(Exception e){
 			e.printStackTrace();

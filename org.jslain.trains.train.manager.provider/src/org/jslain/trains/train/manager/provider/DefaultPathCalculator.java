@@ -13,6 +13,7 @@ import org.osgi.dto.DTO;
 import osgi.enroute.trains.cloud.api.Segment;
 import osgi.enroute.trains.cloud.api.Segment.Type;
 
+
 public class DefaultPathCalculator implements IPathCalculator{
 
 	private String from;
@@ -20,10 +21,14 @@ public class DefaultPathCalculator implements IPathCalculator{
 	private Map<String, Segment> map;
 	private Set<String> tracksDenied;
 	
+	private PathExplorer pathFound;
+	private boolean calculationDone = false;
+	
 	public DefaultPathCalculator(String from, String to, Map<String, Segment> map) {
 		this.from = from;
 		this.to = to;
 		this.map = map;
+		pathFound = null;
 		tracksDenied = new HashSet<>();
 	}
 
@@ -38,87 +43,105 @@ public class DefaultPathCalculator implements IPathCalculator{
 			return null;
 		}
 		
-		boolean found = false;
-		boolean allPathExplored = false;
+		this.doCalculation();
 		
-		PathExplorer pathFound = null;
-		
-		Map<Set<String>, PathExplorer> explorers = new HashMap<>();
-		
-		PathExplorer defaultPath = new PathExplorer();
-		defaultPath.current = map.get(from);
-		
-		explorers.put(defaultPath.switches, defaultPath);
-		
-		while(!found && !allPathExplored){
-			Collection<Set<String>> toRemove = new ArrayList<>();
-			Collection<PathExplorer> toAdd = new ArrayList<>();
+		return pathFound.firstLocatorAfterFirstSwitch;
+	}
+	
+	private void doCalculation(){
+		if(!calculationDone){
+			calculationDone = true;
 			
-			for(Set<String> keys : explorers.keySet()){
-				PathExplorer explorer = explorers.get(keys);
+			boolean found = false;
+			boolean allPathExplored = false;
+			
+			
+			Map<Set<String>, PathExplorer> explorers = new HashMap<>();
+			
+			PathExplorer defaultPath = new PathExplorer();
+			defaultPath.current = map.get(from);
+			
+			explorers.put(defaultPath.switches, defaultPath);
+			
+			while(!found && !allPathExplored){
+				Collection<Set<String>> toRemove = new ArrayList<>();
+				Collection<PathExplorer> toAdd = new ArrayList<>();
 				
-				boolean removed = false;
-				for(String to : explorer.current.to){					
-					if(explorer.alreadyVisited.contains(to)){
-						toRemove.add(keys);
-						removed = true;
+				for(Set<String> keys : explorers.keySet()){
+					PathExplorer explorer = explorers.get(keys);
+					
+					boolean removed = false;
+					for(String to : explorer.current.to){					
+						if(explorer.alreadyVisited.contains(to)){
+							toRemove.add(keys);
+							removed = true;
+						}
+						
 					}
 					
-				}
-				
-				if(!removed){
-					if(explorer.current.type == Type.SWITCH){
-						//We remove the current
-						toRemove.add(keys);
-						
-						//We create 2 new paths with each 'to'
-						for(String to : explorer.current.to){
-							Segment segTo = map.get(to);
-							if(!tracksDenied.contains(segTo.track)){
-								PathExplorer explorerToAdd = new PathExplorer();
-								explorerToAdd.switches.addAll(explorer.switches);
-								explorerToAdd.switches.add(to);
-								explorerToAdd.alreadyVisited.addAll(explorer.alreadyVisited);
-								explorerToAdd.alreadyVisited.add(to);
-								explorerToAdd.current = map.get(to);
-								explorerToAdd.firstLocatorAfterFirstSwitch = explorer.firstLocatorAfterFirstSwitch;
-								
-								if(explorerToAdd.firstLocatorAfterFirstSwitch == null
-										&& Segment.Type.LOCATOR == explorerToAdd.current.type){
-									explorerToAdd.firstLocatorAfterFirstSwitch = explorerToAdd.current.id;
-								}
-								
-								toAdd.add(explorerToAdd);
-								
-								if(explorerToAdd.current.id.equals(this.to)){
-									pathFound = explorerToAdd;
-									found = true;
+					if(!removed){
+						if(explorer.current.type == Type.SWITCH){
+							//We remove the current
+							toRemove.add(keys);
+							
+							//We create 2 new paths with each 'to'
+							for(String to : explorer.current.to){
+								Segment segTo = map.get(to);
+								if(!tracksDenied.contains(segTo.track)){
+									PathExplorer explorerToAdd = new PathExplorer();
+									explorerToAdd.switches.addAll(explorer.switches);
+									explorerToAdd.switches.add(to);
+									explorerToAdd.alreadyVisited.addAll(explorer.alreadyVisited);
+									explorerToAdd.alreadyVisited.add(to);
+									explorerToAdd.current = map.get(to);
+									explorerToAdd.firstLocatorAfterFirstSwitch = explorer.firstLocatorAfterFirstSwitch;
+									explorerToAdd.nextLocator = explorer.nextLocator;
+									
+									if(explorerToAdd.firstLocatorAfterFirstSwitch == null
+											&& Segment.Type.LOCATOR == explorerToAdd.current.type){
+										explorerToAdd.firstLocatorAfterFirstSwitch = explorerToAdd.current.id;
+									}
+									
+									toAdd.add(explorerToAdd);
+									
+									if(explorerToAdd.current.id.equals(this.to)){
+										pathFound = explorerToAdd;
+										found = true;
+									}
 								}
 							}
 						}
-					}
-					else{
-						explorer.alreadyVisited.add(explorer.current.id);
-						explorer.current = map.get(explorer.current.to[0]);
-						
-						if(explorer.current.id.equals(this.to)){
-							pathFound = explorer;
-							found = true;
-						}
-						
-						if(explorer.firstLocatorAfterFirstSwitch == null
-								&& Segment.Type.LOCATOR == explorer.current.type){
-							explorer.firstLocatorAfterFirstSwitch = explorer.current.id;
+						else{
+							explorer.alreadyVisited.add(explorer.current.id);
+							explorer.current = map.get(explorer.current.to[0]);
+							
+							if(explorer.current.id.equals(this.to)){
+								pathFound = explorer;
+								found = true;
+							}
+							
+							if(explorer.firstLocatorAfterFirstSwitch == null
+									&& Segment.Type.LOCATOR == explorer.current.type){
+								explorer.firstLocatorAfterFirstSwitch = explorer.current.id;
+							}
+							
+							if(explorer.nextLocator == null
+									&& Segment.Type.LOCATOR == explorer.current.type){
+								explorer.nextLocator = explorer.current.id;
+							}
 						}
 					}
 				}
+				
+				toRemove.forEach(e -> explorers.remove(e));
+				toAdd.forEach(e -> explorers.put(e.switches, e));
 			}
-			
-			toRemove.forEach(e -> explorers.remove(e));
-			toAdd.forEach(e -> explorers.put(e.switches, e));
+
+			System.out.println(String.format("Current: %s\tNextLocator: %s\tFirstLocatorAfterSwitch: %s", 
+					pathFound.current.id,
+					pathFound.nextLocator,
+					pathFound.firstLocatorAfterFirstSwitch));
 		}
-		
-		return pathFound.firstLocatorAfterFirstSwitch;
 	}
 	
 	private static class PathExplorer extends DTO{
@@ -127,6 +150,7 @@ public class DefaultPathCalculator implements IPathCalculator{
 		
 		Segment current;
 		String firstLocatorAfterFirstSwitch;
+		String nextLocator;
 	}
 	
 	@Override
@@ -156,5 +180,17 @@ public class DefaultPathCalculator implements IPathCalculator{
 	@Override
 	public void excludePossibility(String track) {
 		tracksDenied.add(track);
+	}
+	
+	@Override
+	public String getNextLocator() {
+		if(from == null){
+			return null;
+		}
+		
+		this.doCalculation();
+		
+		
+		return pathFound.nextLocator;
 	}
 }

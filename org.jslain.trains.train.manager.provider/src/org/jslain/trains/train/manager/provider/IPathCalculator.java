@@ -16,5 +16,7 @@ public interface IPathCalculator {
 	String getSegmentWeNeedAccessTo();
 
 	void excludePossibility(String string);
+
+	String getNextLocator();
 	
 }
