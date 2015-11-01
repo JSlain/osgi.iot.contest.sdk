@@ -19,4 +19,5 @@ public interface IPathCalculator {
 
 	String getNextLocator();
 	
+	String getNextSignalBeforeNextLocator();
 }

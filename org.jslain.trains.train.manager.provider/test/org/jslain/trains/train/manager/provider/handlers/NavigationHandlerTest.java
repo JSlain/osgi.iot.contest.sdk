@@ -4,7 +4,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -16,6 +17,7 @@ import org.jslain.trains.train.manager.provider.Constants.Direction;
 import org.jslain.trains.train.manager.provider.Constants.Speed;
 import org.jslain.trains.train.manager.provider.IPathCalculator;
 import org.jslain.trains.train.manager.provider.IPathCalculatorFactory;
+import org.jslain.trains.train.manager.provider.SignalManager;
 import org.jslain.trains.train.manager.provider.TestSegments;
 import org.jslain.trains.train.manager.provider.TrainDto;
 import org.jslain.trains.train.manager.provider.TrainState;
@@ -39,14 +41,18 @@ public class NavigationHandlerTest {
 	private IPathCalculatorFactory mockPathCalculatorFactory;
 	private IPathCalculator mockPathCalculator;
 	
+	private SignalManager mockSignalManager;
+	
 	private TestSegments testSegments;
 	
 	@Before
 	public void setup(){
 		mockPathCalculatorFactory = mock(IPathCalculatorFactory.class);
 		mockPathCalculator = mock(IPathCalculator.class);
+		mockSignalManager = mock(SignalManager.class);
 		
-		underTest = new NavigationHandler(mockPathCalculatorFactory);
+		
+		underTest = new NavigationHandler(mockPathCalculatorFactory, mockSignalManager);
 
 		
 		trainDto = new TrainDto();

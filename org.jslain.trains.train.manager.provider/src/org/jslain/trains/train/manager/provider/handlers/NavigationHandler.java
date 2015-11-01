@@ -4,6 +4,7 @@ import org.jslain.trains.train.manager.provider.Constants.Speed;
 import org.jslain.trains.train.manager.provider.INavigationHandler;
 import org.jslain.trains.train.manager.provider.IPathCalculator;
 import org.jslain.trains.train.manager.provider.IPathCalculatorFactory;
+import org.jslain.trains.train.manager.provider.SignalManager;
 import org.jslain.trains.train.manager.provider.TrainDto;
 import org.jslain.trains.train.manager.provider.TrainState;
 
@@ -13,10 +14,12 @@ import osgi.enroute.trains.train.api.TrainController;
 
 public class NavigationHandler implements INavigationHandler {
 
+	private SignalManager signalManager;
 	private IPathCalculatorFactory pathCalculatorFactory;
 	
-	public NavigationHandler(IPathCalculatorFactory pathCalculatorFactory){
+	public NavigationHandler(IPathCalculatorFactory pathCalculatorFactory, SignalManager signalManager){
 		this.pathCalculatorFactory = pathCalculatorFactory;
+		this.signalManager = signalManager;
 	}
 	
 	@Override
@@ -36,6 +39,11 @@ public class NavigationHandler implements INavigationHandler {
 					trainDto.currentLocation, 
 					trainDto.targetSegment, 
 					trackManager.getSegments());
+			
+			if(signalManager.isRedLight(calculator.getNextSignalBeforeNextLocator())){
+				changeState(trainDto, trainController, TrainState.STOPPING);
+				return false;
+			}
 			
 			String nextSegment = calculator.getNextLocator();
 			if(trainDto.targetSegment != null &&
@@ -74,6 +82,7 @@ public class NavigationHandler implements INavigationHandler {
 	
 	private void goalReached(TrainDto trainDto){
 		trainDto.nextSegmentIsTarget=false;
+		trainDto.targetSegment=null;
 	}
 	
 	private void changeState(

@@ -129,6 +129,11 @@ public class DefaultPathCalculator implements IPathCalculator{
 									&& Segment.Type.LOCATOR == explorer.current.type){
 								explorer.nextLocator = explorer.current.id;
 							}
+							
+							if(explorer.nextLocator == null 
+									&& Segment.Type.SIGNAL == explorer.current.type){
+								explorer.nextSignal = explorer.current.id;
+							}
 						}
 					}
 				}
@@ -146,6 +151,7 @@ public class DefaultPathCalculator implements IPathCalculator{
 		Segment current;
 		String firstLocatorAfterFirstSwitch;
 		String nextLocator;
+		String nextSignal;
 	}
 	
 	@Override
@@ -187,5 +193,16 @@ public class DefaultPathCalculator implements IPathCalculator{
 		
 		
 		return pathFound.nextLocator;
+	}
+	
+	@Override
+	public String getNextSignalBeforeNextLocator() {
+		if(from == null){
+			return null;
+		}
+		
+		this.doCalculation();
+		
+		return pathFound.nextSignal;
 	}
 }

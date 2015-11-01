@@ -39,6 +39,11 @@ public class JSlainTrainManagerImpl {
 		trainDto.name = config.name();
 		trainDto.rfid = config.rfid();
 		
+		SignalManager signalManager = new SignalManager();
+		NavigationHandler navigationHandler 
+			= new NavigationHandler(new DefaultPathCalculatorFactory(),
+					signalManager); 
+		
 		trainThread = new Thread(new TrainLoop(new TrainLifeCycle(
 				trainDto, 
 				trainController, 
@@ -46,8 +51,9 @@ public class JSlainTrainManagerImpl {
 				new TrainObservationHandlerFactory(
 						trackForTrain, 
 						trainDto,
-						new NavigationHandler(new DefaultPathCalculatorFactory()),
-						trainController))));
+						navigationHandler,
+						trainController,
+						signalManager))));
 		
 		trainThread.start();
 	}

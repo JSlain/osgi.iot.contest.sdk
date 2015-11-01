@@ -9,6 +9,7 @@ import static org.mockito.Mockito.mock;
 import org.jslain.trains.train.manager.provider.handlers.AssignmentHandler;
 import org.jslain.trains.train.manager.provider.handlers.LocatedHandler;
 import org.jslain.trains.train.manager.provider.handlers.NoopHandler;
+import org.jslain.trains.train.manager.provider.handlers.SignalHandler;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,6 +26,8 @@ public class TrainObservationHandlerFactoryTest {
 
 	private TrainController mockTrainController;
 	
+	private SignalManager mockSignalManager;
+	
 	private TrainDto trainDto;
 	
 	private TrainObservationHandlerFactory underTest;
@@ -34,19 +37,22 @@ public class TrainObservationHandlerFactoryTest {
 		mockTrackManager = mock(TrackForTrain.class);
 		mockNavHandler = mock(INavigationHandler.class);
 		mockTrainController = mock(TrainController.class);
+		mockSignalManager = mock(SignalManager.class);
 		trainDto = new TrainDto();
 		
 		underTest = new TrainObservationHandlerFactory(
 				mockTrackManager, 
 				trainDto,
 				mockNavHandler,
-				mockTrainController);
+				mockTrainController,
+				mockSignalManager);
 	}
 	
 	@Test
 	public void createTypes(){
 		testType(Type.LOCATED, LocatedHandler.class);
 		testType(Type.ASSIGNMENT, AssignmentHandler.class);
+		testType(Type.SIGNAL, SignalHandler.class);
 		testType(Type.EMULATOR_TRAIN_WRONG_SWITCH, NoopHandler.class);
 	}
 	

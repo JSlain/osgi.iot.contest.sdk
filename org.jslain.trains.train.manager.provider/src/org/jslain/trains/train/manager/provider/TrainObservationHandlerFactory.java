@@ -3,6 +3,7 @@ package org.jslain.trains.train.manager.provider;
 import org.jslain.trains.train.manager.provider.handlers.AssignmentHandler;
 import org.jslain.trains.train.manager.provider.handlers.LocatedHandler;
 import org.jslain.trains.train.manager.provider.handlers.NoopHandler;
+import org.jslain.trains.train.manager.provider.handlers.SignalHandler;
 
 import osgi.enroute.trains.cloud.api.Observation;
 import osgi.enroute.trains.cloud.api.TrackForTrain;
@@ -18,16 +19,20 @@ public class TrainObservationHandlerFactory implements ITrainObservationHandlerF
 	
 	private final TrainController trainController;
 	
+	private final SignalManager signalManager;
+	
 	public TrainObservationHandlerFactory(
 			TrackForTrain trackManager, 
 			TrainDto trainDto,
 			INavigationHandler navigationHandler,
-			TrainController trainController) {
+			TrainController trainController,
+			SignalManager signalManager) {
 		super();
 		this.trackManager = trackManager;
 		this.trainDto = trainDto;
 		this.navigationHandler = navigationHandler;
 		this.trainController = trainController;
+		this.signalManager = signalManager;
 	}
 
 
@@ -42,6 +47,9 @@ public class TrainObservationHandlerFactory implements ITrainObservationHandlerF
 			break;
 		case ASSIGNMENT:
 			toReturn =  new AssignmentHandler();
+			break;
+		case SIGNAL:
+			toReturn = new SignalHandler(signalManager);
 			break;
 		default: 
 			toReturn = new NoopHandler();
