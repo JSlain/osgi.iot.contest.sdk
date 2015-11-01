@@ -11,6 +11,8 @@ import osgi.enroute.trains.train.api.TrainController;
 
 public class TrainObservationHandlerFactory implements ITrainObservationHandlerFactory {
 
+	private static final NoopHandler NOOP = new NoopHandler();
+	
 	private final TrackForTrain trackManager;
 	
 	private final TrainDto trainDto;
@@ -33,6 +35,7 @@ public class TrainObservationHandlerFactory implements ITrainObservationHandlerF
 		this.navigationHandler = navigationHandler;
 		this.trainController = trainController;
 		this.signalManager = signalManager;
+		
 	}
 
 
@@ -52,7 +55,7 @@ public class TrainObservationHandlerFactory implements ITrainObservationHandlerF
 			toReturn = new SignalHandler(signalManager);
 			break;
 		default: 
-			toReturn = new NoopHandler();
+			toReturn = NOOP;
 			break;
 		}
 		
