@@ -72,11 +72,13 @@ public class DefaultPathCalculator implements IPathCalculator{
 					
 					boolean removed = false;
 					for(String to : explorer.current.to){					
-						if(explorer.alreadyVisited.contains(to)){
+						Segment nextSegment = map.get(to);
+						
+						if(explorer.alreadyVisited.contains(to)
+								|| nextSegment.type == Segment.Type.BLOCK){
 							toRemove.add(keys);
 							removed = true;
 						}
-						
 					}
 					
 					if(!removed){
